@@ -12,7 +12,7 @@ safe_chan = ['official-judge-proof', 'rules', 'any-other-deck', 'roles', 'pro-pl
              'master-duel-news', 'helper-handbook', 'tournament-discussion', 'reddit-discussion', 'management',
              'hidden-tips-and-info', 'share-player-id', 'shadow-realm', 'astera-bot-logs', 'ban-logs', 'ckrit', 'timeout-log',
              'carls-logs', 'join-and-leave', 'application-discussion', 'mee6-logs', 'judge-discussion', 'message-deleted',
-             'mod-discussion', 'helper-application']
+             'mod-discussion', 'helper-application', 'creators-channel', 'demotion-discussion', 'test']
 
 new_data = data.drop("interval_start_timestamp", axis=1)
 new_data2 = new_data[~new_data["channel_name"].isin(safe_chan)]
@@ -23,18 +23,35 @@ diamond = [chname for chname in data.channel_name if "diamond" not in chname]
 new_data3 = new_data2[new_data2.channel_name.isin(diamond)]
 new_data3 = new_data3[new_data3.channel_name.isin(fourm_threads)]
 x = 10
-print(f"Low activity channels ({x} lowest channels by # of messages sent per month)")
-messages_data = new_data3.nsmallest(x, "messages")
-print(messages_data.to_string(index=False))
-print("------------------------------------------------------------------------------")
-print(f"Low viewership channels ({x} lowest channels by # of people who open and read channel per month)")
-reader_data = new_data3.nsmallest(x, "readers")
-print(reader_data.to_string(index=False))
-print("------------------------------------------------------------------------------")
-print(f"Low Chatters channels ({x} lowest channels by # of people who type in channel per month)")
-chatter_data = new_data3.nsmallest(x, "chatters")
-print(chatter_data.to_string(index=False))
-print("------------------------------------------------------------------------------")
+answer = input("large or small?")
+if answer.lower() == "small":
+
+    print(f"Low activity channels ({x} lowest channels by # of messages sent per month)")
+    messages_data = new_data3.nsmallest(x, "messages")
+    print(messages_data.to_string(index=False))
+    print("------------------------------------------------------------------------------")
+    print(f"Low viewership channels ({x} lowest channels by # of people who open and read channel per month)")
+    reader_data = new_data3.nsmallest(x, "readers")
+    print(reader_data.to_string(index=False))
+    print("------------------------------------------------------------------------------")
+    print(f"Low Chatters channels ({x} lowest channels by # of people who type in channel per month)")
+    chatter_data = new_data3.nsmallest(x, "chatters")
+    print(chatter_data.to_string(index=False))
+    print("------------------------------------------------------------------------------")
+else:
+
+    print(f"High activity channels ({x} highest channels by # of messages sent per month)")
+    messages_data = new_data3.nlargest(x, "messages")
+    print(messages_data.to_string(index=False))
+    print("------------------------------------------------------------------------------")
+    print(f"High viewership channels ({x} highest channels by # of people who open and read channel per month)")
+    reader_data = new_data3.nlargest(x, "readers")
+    print(reader_data.to_string(index=False))
+    print("------------------------------------------------------------------------------")
+    print(f"High Chatters channels ({x} highest channels by # of people who type in channel per month)")
+    chatter_data = new_data3.nlargest(x, "chatters")
+    print(chatter_data.to_string(index=False))
+    print("------------------------------------------------------------------------------")
 
 frames = [chatter_data, reader_data, messages_data]
 combined_data = pd.concat(frames)
@@ -70,7 +87,10 @@ for id in ids:
         id_list.append(id)
     else:
         pass
-print(f"{', '.join(matches)} are in multiple low activity lists")
+if answer == "small":
+    print(f"{', '.join(matches)} are in multiple low activity lists")
+else:
+    print(f"{', '.join(matches)} are in multiple high activity lists")
 link_list = []
 for thing in id_list:
     link_list.append(f"<#{thing}>")
